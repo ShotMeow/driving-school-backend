@@ -22,7 +22,7 @@ export class AuthController {
   }
 
   @UsePipes(new ValidationPipe())
-  @HttpCode(200)
+  @HttpCode(201)
   @Post('register')
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
