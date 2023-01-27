@@ -4,6 +4,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GroupModule } from './group/group.module';
 import { CategoryModule } from './category/category.module';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CategoryModule } from './category/category.module';
     AuthModule,
     GroupModule,
     CategoryModule,
+    ScheduleModule,
   ],
   controllers: [],
   providers: [],
