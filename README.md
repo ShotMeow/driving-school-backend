@@ -1,4 +1,4 @@
-<h1 align="center">Driving School Frontend</h1>
+<h1 align="center">Driving School Backend</h1>
 
 ![Screen Shot](https://github.com/ShotMeow/driving-school/blob/main/public/github/main.png?raw=true)
 
