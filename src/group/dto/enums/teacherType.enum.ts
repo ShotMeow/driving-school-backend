@@ -1,4 +1,4 @@
 export enum TeacherType {
-  theory = 'theory',
-  practice = 'practice',
+  THEORY = 'theory',
+  PRACTICE = 'practice',
 }
