@@ -9,14 +9,16 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ChangeTeacherDto, GroupDto } from './dto/group.dto';
+import { GroupDto } from './dto/group.dto';
 import { GroupService } from './group.service';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../user/enums/userType.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/role.guard';
+import { TeacherType } from './dto/enums/teacherType.enum';
+import { ParamsInterface } from './interfaces/params.interface';
 
-@Controller('group')
+@Controller('groups')
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
@@ -40,15 +42,18 @@ export class GroupController {
   @Roles(Role.ADMIN)
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Post('change')
-  async changeTeacher(@Body() dto: ChangeTeacherDto) {
-    return this.groupService.changeTeacher(dto);
+  @Post(':groupId/:teacherId')
+  async changeTeacher(
+    @Param() params: ParamsInterface,
+    @Body('teacherType') teacherType: TeacherType,
+  ) {
+    return this.groupService.changeTeacher(params, teacherType);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
-  @Get(':id')
-  async getSchedulesByGroupId(@Param() groupId: { id: number }) {
-    return this.groupService.getSchedulesByGroupId(groupId.id);
+  @Get(':groupId')
+  async getSchedulesByGroupId(@Param('id') id: number) {
+    return this.groupService.getSchedulesByGroupId(id);
   }
 }

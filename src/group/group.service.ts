@@ -2,9 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GroupEntity } from './entities/group.entity';
 import { Repository } from 'typeorm';
-import { ChangeTeacherDto, GroupDto } from './dto/group.dto';
+import { GroupDto } from './dto/group.dto';
 import { UserEntity } from '../user/entities/user.entity';
 import { CategoryEntity } from '../category/entities/category.entity';
+import { TeacherType } from './dto/enums/teacherType.enum';
+import { ParamsInterface } from './interfaces/params.interface';
 
 @Injectable()
 export class GroupService {
@@ -53,20 +55,20 @@ export class GroupService {
     return this.groupRepository.save(group);
   }
 
-  async changeTeacher(dto: ChangeTeacherDto) {
+  async changeTeacher(params: ParamsInterface, teacherType: TeacherType) {
     const group = await this.groupRepository.findOneBy({
-      id: dto.group_id,
+      id: params.groupId,
     });
 
     if (!group) throw new NotFoundException('Такой группы не существует');
 
-    if (dto.type === 'theory') {
+    if (teacherType === 'theory') {
       group.theoryTeacher = await this.userRepository.findOneBy({
-        id: dto.new_teacher,
+        id: params.teacherId,
       });
     } else {
       group.practiceTeacher = await this.userRepository.findOneBy({
-        id: dto.new_teacher,
+        id: params.teacherId,
       });
     }
 

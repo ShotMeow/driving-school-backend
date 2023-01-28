@@ -16,7 +16,7 @@ import { Role } from '../user/enums/userType.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/role.guard';
 
-@Controller('schedule')
+@Controller('schedules')
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
