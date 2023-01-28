@@ -12,7 +12,7 @@ export class UserEntity extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ default: '' })
   patronymic: string;
 
   @Column({ unique: true })
