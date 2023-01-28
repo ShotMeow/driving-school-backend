@@ -19,7 +19,7 @@ export class GroupEntity extends BaseEntity {
   category: CategoryEntity;
 
   @OneToMany(() => UserEntity, (user) => user.group)
-  users: UserEntity[];
+  students: UserEntity[];
 
   @OneToMany(() => ScheduleEntity, (schedule) => schedule.group)
   schedules: ScheduleEntity[];

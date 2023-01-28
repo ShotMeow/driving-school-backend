@@ -1,10 +1,10 @@
 import {
   Body,
   Controller,
-  Get,
+  Delete,
   HttpCode,
   Param,
-  Post,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -24,15 +24,16 @@ export class ScheduleController {
   @Roles(Role.ADMIN)
   @UsePipes(new ValidationPipe())
   @HttpCode(201)
-  @Post('create')
+  @Put('create')
   async createSchedule(@Body() dto: ScheduleDto) {
     return this.scheduleService.createSchedule(dto);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
-  @Get('delete/:id')
+  @Delete(':id')
   async deleteSchedule(@Param('id') id: number) {
+    console.log(id);
     return this.scheduleService.deleteSchedule(id);
   }
 }

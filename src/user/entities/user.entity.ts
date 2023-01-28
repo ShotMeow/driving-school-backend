@@ -30,7 +30,7 @@ export class UserEntity extends BaseEntity {
   @Column({ default: '', name: 'avatar_path' })
   avatarPath: string;
 
-  @ManyToOne(() => GroupEntity, (group) => group.users)
+  @ManyToOne(() => GroupEntity, (group) => group.students)
   @JoinColumn({ name: 'group_id' })
   group: GroupEntity;
 }

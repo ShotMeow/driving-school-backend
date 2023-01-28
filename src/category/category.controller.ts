@@ -2,8 +2,8 @@ import {
   Controller,
   Get,
   HttpCode,
-  Param,
-  Post,
+  Put,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -13,6 +13,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../user/enums/userType.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/role.guard';
+import { CategoryDto } from './dto/category.dto';
 
 @Controller('categories')
 export class CategoryController {
@@ -22,9 +23,9 @@ export class CategoryController {
   @Roles(Role.ADMIN)
   @UsePipes(new ValidationPipe())
   @HttpCode(201)
-  @Post('create/:category')
-  async createCategory(@Param('category') category: string) {
-    return this.categoryService.addCategory(category);
+  @Put('create')
+  async createCategory(@Query() query: CategoryDto) {
+    return this.categoryService.addCategory(query.category);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)

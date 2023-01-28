@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Param,
-  Post,
+  Patch,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -33,7 +35,7 @@ export class GroupController {
   @Roles(Role.ADMIN)
   @UsePipes(new ValidationPipe())
   @HttpCode(201)
-  @Post('create')
+  @Put('create')
   async createGroup(@Body() dto: GroupDto) {
     return this.groupService.createGroup(dto);
   }
@@ -42,7 +44,7 @@ export class GroupController {
   @Roles(Role.ADMIN)
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Post(':groupId/:teacherId')
+  @Patch(':groupId/:teacherId')
   async changeTeacher(
     @Param() params: ParamsInterface,
     @Body('teacherType') teacherType: TeacherType,
@@ -55,5 +57,25 @@ export class GroupController {
   @Get(':groupId')
   async getSchedulesByGroupId(@Param('id') id: number) {
     return this.groupService.getSchedulesByGroupId(id);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Put('create/student/:groupId/:studentId')
+  async addStudentToGroup(
+    @Param('groupId') groupId: number,
+    @Param('studentId') studentId: number,
+  ) {
+    return this.groupService.addStudentToGroup(groupId, studentId);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Delete('delete/student/:groupId/:studentId')
+  async deleteStudentForGroup(
+    @Param('groupId') groupId: number,
+    @Param('studentId') studentId: number,
+  ) {
+    return this.groupService.deleteStudentForGroup(groupId, studentId);
   }
 }

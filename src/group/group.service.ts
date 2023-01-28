@@ -7,6 +7,7 @@ import { UserEntity } from '../user/entities/user.entity';
 import { CategoryEntity } from '../category/entities/category.entity';
 import { TeacherType } from './dto/enums/teacherType.enum';
 import { ParamsInterface } from './interfaces/params.interface';
+import { Role } from '../user/enums/userType.enum';
 
 @Injectable()
 export class GroupService {
@@ -24,6 +25,8 @@ export class GroupService {
       relations: {
         theoryTeacher: true,
         practiceTeacher: true,
+        category: true,
+        students: true,
         schedules: true,
       },
     });
@@ -91,5 +94,47 @@ export class GroupService {
     if (!group) throw new NotFoundException('Такой группы не существует');
 
     return group.schedules;
+  }
+
+  async addStudentToGroup(groupId: number, userId: number) {
+    const user = await this.userRepository.findOneBy({
+      id: userId,
+      role: Role.STUDENT,
+    });
+
+    if (!user) throw new NotFoundException('Студент не найден');
+
+    const group = await this.groupRepository.findOne({
+      where: {
+        id: groupId,
+      },
+      relations: ['students'],
+    });
+
+    if (!group) throw new NotFoundException('Такой группы не существует');
+
+    group.students.push(user);
+
+    return this.groupRepository.save(group);
+  }
+
+  async deleteStudentForGroup(groupId: number, userId: number) {
+    const group = await this.groupRepository.findOne({
+      where: {
+        id: groupId,
+      },
+      relations: ['students'],
+    });
+
+    if (!group) throw new NotFoundException('Такой группы не существует');
+
+    const student = await this.userRepository.findOneBy({
+      id: userId,
+      role: Role.STUDENT,
+    });
+
+    group.students[group.students.indexOf(student) + 1] = null;
+    console.log('index', group.students.indexOf(student) + 1);
+    return await this.groupRepository.save(group);
   }
 }

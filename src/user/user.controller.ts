@@ -1,9 +1,9 @@
 import {
-  Body,
   Controller,
   Get,
   Param,
-  Post,
+  Patch,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -19,6 +19,14 @@ import { UserDto } from './dto/user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('filter')
+  async getUsersByType(@Query() query: UserDto) {
+    return this.userService.getUsersByRole(query.role);
+  }
+
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Get()
@@ -28,19 +36,12 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
-  @Get(':userRole')
-  async getUsersByType(@Param('userRole') role: Role) {
-    return this.userService.getUsersByRole(role);
-  }
-
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
   @UsePipes(new ValidationPipe())
-  @Post(':userId/role')
+  @Patch(':userId')
   async changeUserRole(
     @Param('userId') userId: number,
-    @Body('role') dto: UserDto,
+    @Query() query: UserDto,
   ) {
-    return this.userService.changeUserRole(userId, dto.role);
+    return this.userService.changeUserRole(userId, query.role);
   }
 }
