@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CategoryEntity } from './entities/category.entity';
@@ -11,6 +11,13 @@ export class CategoryService {
   ) {}
 
   async addCategory(category: string) {
+    const oldCategory = this.categoryRepository.findOneBy({
+      category: category,
+    });
+
+    if (oldCategory)
+      throw new BadRequestException('Такая категория уже существует');
+
     const newCategory = this.categoryRepository.create({
       category: category,
     });

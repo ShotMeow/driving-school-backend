@@ -19,8 +19,6 @@ export class ScheduleService {
       id: dto.group_id,
     });
 
-    console.log(dto);
-
     if (!group) throw new NotFoundException('Группа не найдена.');
 
     const newSchedule = this.scheduleRepository.create({
@@ -35,7 +33,6 @@ export class ScheduleService {
     const schedule = await this.scheduleRepository.findOneBy({
       id: id,
     });
-    console.log(schedule);
 
     if (!schedule) throw new NotFoundException('Запись не найдена.');
 

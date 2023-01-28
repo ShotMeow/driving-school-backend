@@ -21,10 +21,10 @@ export class UserEntity extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
-  @Column({ select: false })
+  @Column()
   password: string;
 
-  @Column({ default: 'student' })
+  @Column({ default: 'student', enum: Role })
   role: Role;
 
   @Column({ default: '', name: 'avatar_path' })

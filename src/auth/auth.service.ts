@@ -34,6 +34,7 @@ export class AuthService {
     const user = await this.userRepository.save(newUser);
 
     return {
+      user: this.returnUserFields(user),
       token: await this.issueAccessToken(user.id),
     };
   }
@@ -42,6 +43,7 @@ export class AuthService {
     const user = await this.validateUser(dto);
 
     return {
+      user: this.returnUserFields(user),
       token: await this.issueAccessToken(user.id),
     };
   }
@@ -51,7 +53,6 @@ export class AuthService {
       where: {
         email: dto.email,
       },
-      select: ['id', 'email', 'password'],
     });
 
     if (!user) throw new NotFoundException('Пользователь не найден.');
@@ -76,7 +77,14 @@ export class AuthService {
   returnUserFields(user: UserEntity) {
     return {
       id: user.id,
+      surname: user.surname,
+      name: user.name,
+      patronymic: user.patronymic,
+      phone: user.phone,
       email: user.email,
+      role: user.role,
+      avatarPath: user.avatarPath,
+      group: user.group,
     };
   }
 }

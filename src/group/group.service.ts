@@ -62,14 +62,17 @@ export class GroupService {
 
     if (!group) throw new NotFoundException('Такой группы не существует');
 
+    const newTeacher = await this.userRepository.findOneBy({
+      id: params.teacherId,
+    });
+
+    if (!newTeacher)
+      throw new NotFoundException('Такого пользователя не существует');
+
     if (teacherType === 'theory') {
-      group.theoryTeacher = await this.userRepository.findOneBy({
-        id: params.teacherId,
-      });
+      group.theoryTeacher = newTeacher;
     } else {
-      group.practiceTeacher = await this.userRepository.findOneBy({
-        id: params.teacherId,
-      });
+      group.practiceTeacher = newTeacher;
     }
 
     return await this.groupRepository.save(group);
