@@ -5,19 +5,17 @@ import { AuthModule } from './auth/auth.module';
 import { GroupModule } from './group/group.module';
 import { CategoryModule } from './category/category.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { getTypeOrmConfig } from './config/typeorm.config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      database: 'driving-school',
-      username: 'postgres',
-      password: 'admin',
-      autoLoadEntities: true,
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: getTypeOrmConfig,
     }),
+    ConfigModule.forRoot(),
     UserModule,
     AuthModule,
     GroupModule,
