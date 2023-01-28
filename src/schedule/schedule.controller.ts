@@ -24,9 +24,12 @@ export class ScheduleController {
   @Roles(Role.ADMIN)
   @UsePipes(new ValidationPipe())
   @HttpCode(201)
-  @Put('create')
-  async createSchedule(@Body() dto: ScheduleDto) {
-    return this.scheduleService.createSchedule(dto);
+  @Put('create/:groupId')
+  async createSchedule(
+    @Param('groupId') groupId: number,
+    @Body() dto: ScheduleDto,
+  ) {
+    return this.scheduleService.createSchedule(groupId, dto);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)

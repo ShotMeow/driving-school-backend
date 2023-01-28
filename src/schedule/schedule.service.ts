@@ -14,9 +14,9 @@ export class ScheduleService {
     private readonly groupRepository: Repository<GroupEntity>,
   ) {}
 
-  async createSchedule(dto: ScheduleDto) {
+  async createSchedule(groupId: number, dto: ScheduleDto) {
     const group = await this.groupRepository.findOneBy({
-      id: dto.group_id,
+      id: groupId,
     });
 
     if (!group) throw new NotFoundException('Группа не найдена.');

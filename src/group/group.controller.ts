@@ -55,7 +55,7 @@ export class GroupController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Get(':groupId')
-  async getSchedulesByGroupId(@Param('id') id: number) {
+  async getSchedulesByGroupId(@Param('groupId') id: number) {
     return this.groupService.getSchedulesByGroupId(id);
   }
 
@@ -67,6 +67,13 @@ export class GroupController {
     @Param('studentId') studentId: number,
   ) {
     return this.groupService.addStudentToGroup(groupId, studentId);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Delete('delete/:groupId')
+  async deleteGroup(@Param('groupId') groupId: number) {
+    return this.groupService.deleteGroup(groupId);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
