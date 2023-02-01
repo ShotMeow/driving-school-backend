@@ -1,6 +1,6 @@
 <h1 align="center">Driving School Backend</h1>
 
-![Screen Shot](https://github.com/ShotMeow/driving-school/blob/main/public/github/main.png?raw=true)
+![Screen Shot](https://github.com/ShotMeow/ShotMeow/blob/main/assets/driving-school/preview.png?raw=true)
 
 <h2 align="center">О проекте</h2>
 <p align="center">Driving School Backend - реализация API для одноименного проекта, осуществленный посредством использования технологий Node.js + NestJS. Данный проект не продуктовый и разработан в качестве работы для портфолио.</p>
