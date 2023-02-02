@@ -11,7 +11,7 @@ export class CategoryService {
   ) {}
 
   async addCategory(category: string) {
-    const oldCategory = this.categoryRepository.findOneBy({
+    const oldCategory = await this.categoryRepository.findOneBy({
       category: category,
     });
 

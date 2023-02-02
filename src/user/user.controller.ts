@@ -1,9 +1,11 @@
 import {
   Controller,
+  ExecutionContext,
   Get,
   Param,
   Patch,
   Query,
+  Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -14,6 +16,7 @@ import { Role } from './enums/userType.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { UserDto } from './dto/user.dto';
+import { User } from './decorators/user.decorator';
 
 @Controller('users')
 export class UserController {
@@ -43,5 +46,11 @@ export class UserController {
     @Query() query: UserDto,
   ) {
     return this.userService.changeUserRole(userId, query.role);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('profile')
+  async getCurrentUser(@User() user) {
+    return this.userService.getUserProfile(user.id);
   }
 }

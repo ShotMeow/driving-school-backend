@@ -21,8 +21,23 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const oldUser = await this.userRepository.findOneBy({ email: dto.email });
-    if (oldUser) throw new BadRequestException('Email уже занят');
+    const oldEmailUser = await this.userRepository.findOneBy({
+      email: dto.email,
+    });
+    if (oldEmailUser)
+      throw new BadRequestException({
+        field: 'email',
+        message: 'Email уже занят',
+      });
+
+    const oldPhoneUser = await this.userRepository.findOneBy({
+      phone: dto.phone,
+    });
+    if (oldPhoneUser)
+      throw new BadRequestException({
+        field: 'phone',
+        message: 'Номер телефона уже занят',
+      });
 
     const salt = await genSalt(10);
 
@@ -34,7 +49,6 @@ export class AuthService {
     const user = await this.userRepository.save(newUser);
 
     return {
-      user: this.returnUserFields(user),
       token: await this.issueAccessToken(user.id),
     };
   }
@@ -43,7 +57,6 @@ export class AuthService {
     const user = await this.validateUser(dto);
 
     return {
-      user: this.returnUserFields(user),
       token: await this.issueAccessToken(user.id),
     };
   }
@@ -55,7 +68,7 @@ export class AuthService {
       },
     });
 
-    if (!user) throw new NotFoundException('Пользователь не найден.');
+    if (!user) throw new NotFoundException('Почта или пароль введены не верно');
 
     const isValidPassword = await compare(dto.password, user.password);
     if (!isValidPassword)
@@ -72,19 +85,5 @@ export class AuthService {
     return await this.jwtService.signAsync(data, {
       expiresIn: '31d',
     });
-  }
-
-  returnUserFields(user: UserEntity) {
-    return {
-      id: user.id,
-      surname: user.surname,
-      name: user.name,
-      patronymic: user.patronymic,
-      phone: user.phone,
-      email: user.email,
-      role: user.role,
-      avatarPath: user.avatarPath,
-      group: user.group,
-    };
   }
 }

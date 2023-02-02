@@ -34,4 +34,16 @@ export class UserService {
 
     return this.userRepository.save(user);
   }
+
+  async getUserProfile(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) throw new NotFoundException('Пользователь не найден');
+
+    return user;
+  }
 }

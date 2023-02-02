@@ -38,18 +38,21 @@ export class GroupService {
   async createGroup(dto: GroupDto) {
     const practiceTeacher = await this.userRepository.findOneBy({
       id: dto.practice_teacher,
+      role: Role.TEACHER,
     });
 
     const theoryTeacher = await this.userRepository.findOneBy({
       id: dto.theory_teacher,
+      role: Role.TEACHER,
     });
+
+    if (!practiceTeacher || !theoryTeacher)
+      throw new NotFoundException('Такого учителя не существует');
 
     const category = await this.categoryRepository.findOneBy({
       category: dto.category,
     });
 
-    if (!practiceTeacher || !theoryTeacher)
-      throw new NotFoundException('Такого пользователя не существует');
     if (!category) throw new NotFoundException('Такой категории не существует');
 
     const group = await this.groupRepository.create({

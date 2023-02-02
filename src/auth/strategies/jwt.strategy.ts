@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -21,6 +21,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate({ id }: Pick<UserEntity, 'id'>) {
-    return this.userRepository.findBy({ id });
+    const user = this.userRepository.findBy({ id });
+
+    if (!user) throw new UnauthorizedException();
+
+    return user;
   }
 }
