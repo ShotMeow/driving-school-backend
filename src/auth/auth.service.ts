@@ -55,7 +55,6 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.validateUser(dto);
-
     return {
       token: await this.issueAccessToken(user.id),
     };
@@ -65,6 +64,10 @@ export class AuthService {
     const user = await this.userRepository.findOne({
       where: {
         email: dto.email,
+      },
+      select: {
+        id: true,
+        password: true,
       },
     });
 

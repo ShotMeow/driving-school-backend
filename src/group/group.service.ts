@@ -38,12 +38,12 @@ export class GroupService {
   async createGroup(dto: GroupDto) {
     const practiceTeacher = await this.userRepository.findOneBy({
       id: dto.practice_teacher,
-      role: Role.TEACHER,
+      role: Role.PRACTICE_TEACHER,
     });
 
     const theoryTeacher = await this.userRepository.findOneBy({
       id: dto.theory_teacher,
-      role: Role.TEACHER,
+      role: Role.THEORY_TEACHER,
     });
 
     if (!practiceTeacher || !theoryTeacher)

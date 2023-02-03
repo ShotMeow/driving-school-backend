@@ -48,7 +48,19 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
-  async getCurrentUser(@User() user) {
-    return this.userService.getUserProfile(user.id);
+  async getAuthUser(@User() user) {
+    return this.userService.getAuthUser(user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('profile/group')
+  async getGroupByAuthUser(@User() user) {
+    return this.userService.getGroupByUserId(user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('profile/group/:userId')
+  async getGroupByUserId(@Param('userId') userId: number) {
+    return this.userService.getGroupByUserId(userId);
   }
 }

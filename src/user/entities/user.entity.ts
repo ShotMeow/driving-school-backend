@@ -21,14 +21,14 @@ export class UserEntity extends BaseEntity {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column({ default: 'student', enum: Role })
   role: Role;
 
-  @Column({ default: '', name: 'avatar_path' })
-  avatarPath: string;
+  @Column({ default: null, name: 'avatar_path' })
+  avatarPath?: string;
 
   @ManyToOne(() => GroupEntity, (group) => group.students)
   @JoinColumn({ name: 'group_id' })

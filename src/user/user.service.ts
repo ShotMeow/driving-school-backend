@@ -35,7 +35,7 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async getUserProfile(userId: number) {
+  async getAuthUser(userId: number) {
     const user = await this.userRepository.findOne({
       where: {
         id: userId,
@@ -45,5 +45,26 @@ export class UserService {
     if (!user) throw new NotFoundException('Пользователь не найден');
 
     return user;
+  }
+
+  async getGroupByUserId(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+        role: Role.STUDENT,
+      },
+      relations: {
+        group: {
+          theoryTeacher: true,
+          practiceTeacher: true,
+          schedules: true,
+          category: true,
+        },
+      },
+    });
+
+    if (!user) throw new NotFoundException('Студент не найден');
+
+    return user.group;
   }
 }
