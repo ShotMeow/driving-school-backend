@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GroupEntity } from './entities/group.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { GroupDto } from './dto/group.dto';
 import { UserEntity } from '../user/entities/user.entity';
 import { CategoryEntity } from '../category/entities/category.entity';
@@ -23,16 +23,80 @@ export class GroupService {
     private readonly scheduleRepository: Repository<ScheduleEntity>,
   ) {}
 
-  async getAllGroups() {
-    return await this.groupRepository.find({
-      relations: {
-        theoryTeacher: true,
-        practiceTeacher: true,
-        category: true,
-        students: true,
-        schedules: true,
-      },
-    });
+  async getGroupsBySearchTerm(query: { search: string | number }) {
+    if (query.search) {
+      if (isNaN(+query.search)) {
+        return await this.groupRepository.find({
+          where: [
+            {
+              category: {
+                category: ILike(`%${query.search}%`),
+              },
+            },
+            {
+              theoryTeacher: {
+                name: ILike(`%${query.search}%`),
+              },
+            },
+            {
+              theoryTeacher: {
+                surname: ILike(`%${query.search}%`),
+              },
+            },
+            {
+              theoryTeacher: {
+                patronymic: ILike(`%${query.search}%`),
+              },
+            },
+            {
+              practiceTeacher: {
+                name: ILike(`%${query.search}%`),
+              },
+            },
+            {
+              practiceTeacher: {
+                surname: ILike(`%${query.search}%`),
+              },
+            },
+            {
+              practiceTeacher: {
+                patronymic: ILike(`%${query.search}%`),
+              },
+            },
+          ],
+          relations: {
+            theoryTeacher: true,
+            practiceTeacher: true,
+            category: true,
+            students: true,
+            schedules: true,
+          },
+        });
+      } else {
+        return await this.groupRepository.find({
+          where: {
+            id: +query.search,
+          },
+          relations: {
+            theoryTeacher: true,
+            practiceTeacher: true,
+            category: true,
+            students: true,
+            schedules: true,
+          },
+        });
+      }
+    } else {
+      return await this.groupRepository.find({
+        relations: {
+          theoryTeacher: true,
+          practiceTeacher: true,
+          category: true,
+          students: true,
+          schedules: true,
+        },
+      });
+    }
   }
 
   async createGroup(dto: GroupDto) {

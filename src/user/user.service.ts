@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Role } from './enums/userType.enum';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -15,12 +16,22 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async getUsersByRole(role: Role) {
-    return this.userRepository.find({
-      where: {
-        role: role,
-      },
-    });
+  async getUsersByRoleAndSearchTerm(query: UserDto) {
+    if (query.search) {
+      return this.userRepository.find({
+        where: [
+          { role: query.role, name: ILike(`%${query.search}%`) },
+          { role: query.role, surname: ILike(`%${query.search}%`) },
+          { role: query.role, patronymic: ILike(`%${query.search}%`) },
+        ],
+      });
+    } else {
+      return this.userRepository.find({
+        where: {
+          role: query.role,
+        },
+      });
+    }
   }
 
   async changeUserRole(userId: number, role: Role) {

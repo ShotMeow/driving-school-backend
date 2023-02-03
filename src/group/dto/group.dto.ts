@@ -1,5 +1,4 @@
-import { IsEnum, IsNumber, IsString } from 'class-validator';
-import { TeacherType } from './enums/teacherType.enum';
+import { IsNumber, IsString } from 'class-validator';
 
 export class GroupDto {
   @IsNumber()
@@ -10,16 +9,4 @@ export class GroupDto {
 
   @IsString()
   category: string;
-}
-
-export class ChangeTeacherDto {
-  @IsNumber()
-  group_id: number;
-
-  @IsNumber()
-  new_teacher: number;
-
-  @IsString()
-  @IsEnum(TeacherType)
-  type: 'theory' | 'practice';
 }

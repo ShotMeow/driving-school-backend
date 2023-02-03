@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Put,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -27,8 +28,8 @@ export class GroupController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Get()
-  async getAllGroups() {
-    return this.groupService.getAllGroups();
+  async getGroupsBySearchTerm(@Query() query: { search: string }) {
+    return this.groupService.getGroupsBySearchTerm(query);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)

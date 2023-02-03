@@ -24,8 +24,8 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Get('filter')
-  async getUsersByType(@Query() query: UserDto) {
-    return this.userService.getUsersByRole(query.role);
+  async getUsersByRoleAndSearchTerm(@Query() query: UserDto) {
+    return this.userService.getUsersByRoleAndSearchTerm(query);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
