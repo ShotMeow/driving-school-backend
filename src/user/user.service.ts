@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike, IsNull, Not, Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Role } from './enums/userType.enum';
 import { UserDto } from './dto/user.dto';
@@ -35,12 +35,21 @@ export class UserService {
   }
 
   async getStudentsWithGroup(search: string) {
+    console.log(search);
     return this.userRepository.find({
-      where: [
-        { role: Role.STUDENT, name: ILike(`%${search}%`) },
-        { role: Role.STUDENT, surname: ILike(`%${search}%`) },
-        { role: Role.STUDENT, patronymic: ILike(`%${search}%`) },
-      ],
+      where: {
+        role: Role.STUDENT,
+        group: Not(IsNull()),
+      },
+    });
+  }
+
+  async getStudentsWithoutGroup() {
+    return this.userRepository.find({
+      where: {
+        role: Role.STUDENT,
+        group: IsNull(),
+      },
     });
   }
 

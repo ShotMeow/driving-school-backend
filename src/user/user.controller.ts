@@ -32,8 +32,16 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Get('students')
-  async getStudentsWithGroup(@Query('search') query: { search: string }) {
-    return this.userService.getStudentsWithGroup(query.search);
+  async getStudentsWithGroup(@Query() search: string) {
+    return this.userService.getStudentsWithGroup(search);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('students/without')
+  async getStudentsWithoutGroup() {
+    return this.userService.getStudentsWithoutGroup();
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)

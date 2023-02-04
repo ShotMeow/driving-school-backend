@@ -204,36 +204,18 @@ export class GroupService {
     });
 
     group.students[group.students.indexOf(student) + 1] = null;
-    console.log('index', group.students.indexOf(student) + 1);
     return await this.groupRepository.save(group);
   }
 
   async deleteGroup(groupId: number) {
-    const group = await this.groupRepository.findOneBy({
-      id: groupId,
+    const group = await this.groupRepository.findOne({
+      where: {
+        id: groupId,
+      },
     });
 
     if (!group) throw new NotFoundException('Группа не найдена');
 
-    const schedules = await this.scheduleRepository.find({
-      where: {
-        group: {
-          id: groupId,
-        },
-      },
-    });
-
-    const users = await this.userRepository.find({
-      where: {
-        group: {
-          id: groupId,
-        },
-      },
-    });
-
-    await this.userRepository.remove(users);
-    await this.scheduleRepository.remove(schedules);
-
-    return await this.groupRepository.remove(group);
+    return await this.groupRepository.delete(group.id);
   }
 }
