@@ -216,6 +216,20 @@ export class GroupService {
 
     if (!group) throw new NotFoundException('Группа не найдена');
 
+    const user = await this.userRepository.findOne({
+      where: {
+        group: {
+          id: groupId,
+        },
+      },
+      relations: {
+        group: true,
+      },
+    });
+
+    user.group = null;
+    await this.userRepository.save(user);
+
     return await this.groupRepository.delete(group.id);
   }
 }
