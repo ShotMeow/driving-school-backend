@@ -28,6 +28,14 @@ export class UserController {
     return this.userService.getUsersByRoleAndSearchTerm(query);
   }
 
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('students')
+  async getStudentsWithGroup(@Query('search') query: { search: string }) {
+    return this.userService.getStudentsWithGroup(query.search);
+  }
+
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Get()

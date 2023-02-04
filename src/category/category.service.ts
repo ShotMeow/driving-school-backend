@@ -12,14 +12,14 @@ export class CategoryService {
 
   async addCategory(category: string) {
     const oldCategory = await this.categoryRepository.findOneBy({
-      category: category,
+      value: category,
     });
 
     if (oldCategory)
       throw new BadRequestException('Такая категория уже существует');
 
     const newCategory = this.categoryRepository.create({
-      category: category,
+      value: category,
     });
 
     return this.categoryRepository.save(newCategory);
@@ -29,7 +29,7 @@ export class CategoryService {
     return this.categoryRepository.find({
       select: {
         id: true,
-        category: true,
+        value: true,
       },
     });
   }

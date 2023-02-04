@@ -30,7 +30,7 @@ export class GroupService {
           where: [
             {
               category: {
-                category: ILike(`%${query.search}%`),
+                value: ILike(`%${query.search}%`),
               },
             },
             {
@@ -114,7 +114,7 @@ export class GroupService {
       throw new NotFoundException('Такого учителя не существует');
 
     const category = await this.categoryRepository.findOneBy({
-      category: dto.category,
+      value: dto.category,
     });
 
     if (!category) throw new NotFoundException('Такой категории не существует');

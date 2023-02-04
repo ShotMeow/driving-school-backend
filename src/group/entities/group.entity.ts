@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../utils/dto.utils';
 import { UserEntity } from '../../user/entities/user.entity';
 import { CategoryEntity } from '../../category/entities/category.entity';
@@ -6,15 +6,15 @@ import { ScheduleEntity } from '../../schedule/entities/schedule.entity';
 
 @Entity('group')
 export class GroupEntity extends BaseEntity {
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'practice_teacher' })
   practiceTeacher: UserEntity;
 
-  @OneToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'theory_teacher' })
   theoryTeacher: UserEntity;
 
-  @OneToOne(() => CategoryEntity)
+  @ManyToOne(() => CategoryEntity)
   @JoinColumn({ name: 'category_id' })
   category: CategoryEntity;
 

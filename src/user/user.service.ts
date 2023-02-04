@@ -34,6 +34,16 @@ export class UserService {
     }
   }
 
+  async getStudentsWithGroup(search: string) {
+    return this.userRepository.find({
+      where: [
+        { role: Role.STUDENT, name: ILike(`%${search}%`) },
+        { role: Role.STUDENT, surname: ILike(`%${search}%`) },
+        { role: Role.STUDENT, patronymic: ILike(`%${search}%`) },
+      ],
+    });
+  }
+
   async changeUserRole(userId: number, role: Role) {
     const user = await this.userRepository.findOneBy({
       id: userId,
