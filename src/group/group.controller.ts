@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   Param,
   Patch,
   Put,
@@ -12,14 +11,13 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { GroupDto } from './dto/group.dto';
 import { GroupService } from './group.service';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../user/enums/userType.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/role.guard';
-import { TeacherType } from './dto/enums/teacherType.enum';
-import { ParamsInterface } from './interfaces/params.interface';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../user/enums/userType.enum';
+import { CreateGroupDto } from './dto/createGroup.dto';
+import { UpdateGroupDto } from './dto/updateGroup.dto';
 
 @Controller('groups')
 export class GroupController {
@@ -28,62 +26,40 @@ export class GroupController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Get()
-  async getGroupsBySearchTerm(@Query() query: { search: string }) {
-    return this.groupService.getGroupsBySearchTerm(query);
+  async index(@Query('search') search: string) {
+    return this.groupService.getAllGroups(search);
   }
 
+  @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
-  @UsePipes(new ValidationPipe())
-  @HttpCode(201)
   @Put('create')
-  async createGroup(@Body() dto: GroupDto) {
-    return this.groupService.createGroup(dto);
-  }
-
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
-  @UsePipes(new ValidationPipe())
-  @HttpCode(200)
-  @Patch(':groupId/:teacherId')
-  async changeTeacher(
-    @Param() params: ParamsInterface,
-    @Body('teacherType') teacherType: TeacherType,
-  ) {
-    return this.groupService.changeTeacher(params, teacherType);
+  async create(@Body() body: CreateGroupDto) {
+    return this.groupService.createGroup(body);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Get(':groupId')
-  async getSchedulesByGroupId(@Param('groupId') id: number) {
-    return this.groupService.getSchedulesByGroupId(id);
+  async show(@Param('groupId') groupId: number) {
+    return this.groupService.getCurrentGroup(groupId);
   }
 
+  @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
-  @Put('create/student/:groupId/:studentId')
-  async addStudentToGroup(
+  @Patch(':groupId')
+  async update(
     @Param('groupId') groupId: number,
-    @Param('studentId') studentId: number,
+    @Body() body: UpdateGroupDto,
   ) {
-    return this.groupService.addStudentToGroup(groupId, studentId);
+    return this.groupService.updateGroup(groupId, body);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
-  @Delete('delete/:groupId')
-  async deleteGroup(@Param('groupId') groupId: number) {
-    return this.groupService.deleteGroup(groupId);
-  }
-
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
-  @Delete('delete/student/:groupId/:studentId')
-  async deleteStudentForGroup(
-    @Param('groupId') groupId: number,
-    @Param('studentId') studentId: number,
-  ) {
-    return this.groupService.deleteStudentForGroup(groupId, studentId);
+  @Delete(':groupId')
+  async destroy(@Param('groupId') groupId: number) {
+    return this.groupService.destroyGroup(groupId);
   }
 }

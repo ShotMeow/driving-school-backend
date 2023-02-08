@@ -7,11 +7,11 @@ import { ScheduleEntity } from '../../schedule/entities/schedule.entity';
 @Entity('group')
 export class GroupEntity extends BaseEntity {
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: 'practice_teacher' })
+  @JoinColumn({ name: 'practice_teacher_id' })
   practiceTeacher: UserEntity;
 
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: 'theory_teacher' })
+  @JoinColumn({ name: 'theory_teacher_id' })
   theoryTeacher: UserEntity;
 
   @ManyToOne(() => CategoryEntity)
