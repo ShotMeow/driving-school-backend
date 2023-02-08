@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 import { CategoryEntity } from './entities/category.entity';
 
 @Injectable()
@@ -10,8 +10,10 @@ export class CategoryService {
     private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
 
-  async getAllCategories() {
-    return await this.categoryRepository.find();
+  async getAllCategories(search?: string) {
+    return await this.categoryRepository.findBy({
+      value: Like(`%${search}%`)
+    });
   }
 
   async getCurrentCategory(categoryId: number) {

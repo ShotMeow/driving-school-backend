@@ -5,7 +5,7 @@ import {
   Get,
   HttpCode, Param,
   Patch,
-  Put,
+  Put, Query,
   UseGuards,
   UsePipes,
   ValidationPipe
@@ -23,8 +23,8 @@ export class CategoryController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Get()
-  async index() {
-    return this.categoryService.getAllCategories();
+  async index(@Query('search') search?: string) {
+    return this.categoryService.getAllCategories(search);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
