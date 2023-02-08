@@ -1,6 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from "typeorm";
+import { Like, Repository } from 'typeorm';
 import { CategoryEntity } from './entities/category.entity';
 
 @Injectable()
@@ -10,16 +14,16 @@ export class CategoryService {
     private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
 
-  async getAllCategories(search?: string) {
+  async getAllCategories(search: string = '') {
     return await this.categoryRepository.findBy({
-      value: Like(`%${search}%`)
+      value: Like(`%${search}%`),
     });
   }
 
   async getCurrentCategory(categoryId: number) {
     const category = await this.categoryRepository.findOneBy({
-      id: categoryId
-    })
+      id: categoryId,
+    });
 
     if (!category) throw new NotFoundException('Такой категории не существует');
 
@@ -32,7 +36,9 @@ export class CategoryService {
     });
 
     if (oldCategory)
-      throw new BadRequestException('Категория с таким названием уже существует');
+      throw new BadRequestException(
+        'Категория с таким названием уже существует',
+      );
 
     const newCategory = this.categoryRepository.create({
       value: value,
@@ -46,7 +52,10 @@ export class CategoryService {
       value: value,
     });
 
-    if (oldCategory) throw new BadRequestException('Категория с таким названием уже существует');
+    if (oldCategory)
+      throw new BadRequestException(
+        'Категория с таким названием уже существует',
+      );
 
     const category = await this.categoryRepository.findOneBy({
       id: categoryId,
@@ -61,8 +70,8 @@ export class CategoryService {
 
   async destroyCategory(categoryId: number) {
     const category = await this.categoryRepository.findOneBy({
-      id: categoryId
-    })
+      id: categoryId,
+    });
 
     if (!category) throw new NotFoundException('Такой категории не существует');
 

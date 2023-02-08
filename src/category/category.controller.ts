@@ -3,13 +3,15 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode, Param,
+  HttpCode,
+  Param,
   Patch,
-  Put, Query,
+  Put,
+  Query,
   UseGuards,
   UsePipes,
-  ValidationPipe
-} from "@nestjs/common";
+  ValidationPipe,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../user/enums/userType.enum';
@@ -23,7 +25,7 @@ export class CategoryController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Get()
-  async index(@Query('search') search?: string) {
+  async index(@Query('search') search: string) {
     return this.categoryService.getAllCategories(search);
   }
 
@@ -46,7 +48,10 @@ export class CategoryController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
   @Patch(':categoryId')
-  async update(@Param('categoryId') categoryId: number, @Body('value') value: string) {
+  async update(
+    @Param('categoryId') categoryId: number,
+    @Body('value') value: string,
+  ) {
     return this.categoryService.updateCategory(categoryId, value);
   }
 
