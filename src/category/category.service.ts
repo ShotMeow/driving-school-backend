@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { CategoryEntity } from './entities/category.entity';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class CategoryService {
 
   async getAllCategories(search: string = '') {
     return await this.categoryRepository.findBy({
-      value: Like(`%${search}%`),
+      value: ILike(`%${search}%`),
     });
   }
 
