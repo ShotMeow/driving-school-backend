@@ -27,7 +27,7 @@ export class AuthService {
     if (oldEmailUser)
       throw new BadRequestException({
         field: 'email',
-        message: 'Такой E-mail уже используется',
+        error: 'Такой E-mail уже используется',
       });
 
     const oldPhoneUser = await this.userRepository.findOneBy({
@@ -36,7 +36,7 @@ export class AuthService {
     if (oldPhoneUser)
       throw new BadRequestException({
         field: 'phone',
-        message: 'Номер телефона уже занят',
+        error: 'Номер телефона уже занят',
       });
 
     const salt = await genSalt(10);
@@ -73,15 +73,14 @@ export class AuthService {
 
     if (!user)
       throw new NotFoundException({
-        field: 'all',
-        message: 'Такого пользователя не существует',
+        error: 'Такого пользователя не существует',
       });
 
     const isValidPassword = await compare(dto.password, user.password);
     if (!isValidPassword)
       throw new UnauthorizedException({
         field: 'password',
-        message: 'Не правильный пароль',
+        error: 'Не правильный пароль',
       });
 
     return user;
