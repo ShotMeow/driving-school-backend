@@ -1,21 +1,20 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
-  HttpCode,
+  HttpCode, Param,
   Patch,
   Put,
-  Query,
   UseGuards,
   UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+  ValidationPipe
+} from "@nestjs/common";
 import { CategoryService } from './category.service';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../user/enums/userType.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/role.guard';
-import { CategoryChangeDto, CategorySearchDto } from './dto/category.dto';
 
 @Controller('categories')
 export class CategoryController {
@@ -23,31 +22,38 @@ export class CategoryController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
+  @Get()
+  async index() {
+    return this.categoryService.getAllCategories();
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
   @UsePipes(new ValidationPipe())
   @HttpCode(201)
   @Put('create')
-  async createCategory(@Query('category') category: string) {
-    return this.categoryService.addCategory(category);
+  async create(@Body('value') value: string) {
+    return this.categoryService.createCategory(value);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
-  @Get()
-  async getCategories(@Query() query: CategorySearchDto) {
-    return this.categoryService.getCategories(query);
+  @Get(':categoryId')
+  async show(@Param('categoryId') categoryId: number) {
+    return this.categoryService.getCurrentCategory(categoryId);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
-  @Delete('delete')
-  async deleteCategory(@Query('categoryId') categoryId: number) {
-    return this.categoryService.deleteCategory(categoryId);
+  @Patch(':categoryId')
+  async update(@Param('categoryId') categoryId: number, @Body('value') value: string) {
+    return this.categoryService.updateCategory(categoryId, value);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
-  @Patch('change')
-  async changeCategory(@Query() query: CategoryChangeDto) {
-    return this.categoryService.changeCategory(query);
+  @Delete(':categoryId')
+  async destroy(@Param('categoryId') categoryId: number) {
+    return this.categoryService.destroyCategory(categoryId);
   }
 }

@@ -1,8 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { Repository } from "typeorm";
 import { CategoryEntity } from './entities/category.entity';
-import { CategoryChangeDto, CategorySearchDto } from './dto/category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -11,54 +10,60 @@ export class CategoryService {
     private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
 
-  async addCategory(category: string) {
-    console.log(category);
+  async getAllCategories() {
+    return await this.categoryRepository.find();
+  }
+
+  async getCurrentCategory(categoryId: number) {
+    const category = await this.categoryRepository.findOneBy({
+      id: categoryId
+    })
+
+    if (!category) throw new NotFoundException('Такой категории не существует');
+
+    return category;
+  }
+
+  async createCategory(value: string) {
     const oldCategory = await this.categoryRepository.findOneBy({
-      value: category,
+      value: value,
     });
 
     if (oldCategory)
-      throw new BadRequestException('Такая категория уже существует');
+      throw new BadRequestException('Категория с таким названием уже существует');
 
     const newCategory = this.categoryRepository.create({
-      value: category,
+      value: value,
     });
 
     return this.categoryRepository.save(newCategory);
   }
 
-  async getCategories(query: CategorySearchDto) {
-    if (query.search) {
-      return this.categoryRepository.find({
-        where: {
-          value: ILike(`%${query.search}%`),
-        },
-        select: {
-          id: true,
-          value: true,
-        },
-      });
-    } else {
-      return this.categoryRepository.find({
-        select: {
-          id: true,
-          value: true,
-        },
-      });
-    }
-  }
-
-  async deleteCategory(categoryId: number) {
-    return this.categoryRepository.delete(categoryId);
-  }
-
-  async changeCategory(query: CategoryChangeDto) {
-    const category = await this.categoryRepository.findOneBy({
-      id: query.categoryId,
+  async updateCategory(categoryId: number, value: string) {
+    const oldCategory = await this.categoryRepository.findOneBy({
+      value: value,
     });
 
-    category.value = query.value;
+    if (oldCategory) throw new BadRequestException('Категория с таким названием уже существует');
+
+    const category = await this.categoryRepository.findOneBy({
+      id: categoryId,
+    });
+
+    if (!category) throw new NotFoundException('Такой категории не существует');
+
+    category.value = value;
 
     return this.categoryRepository.save(category);
+  }
+
+  async destroyCategory(categoryId: number) {
+    const category = await this.categoryRepository.findOneBy({
+      id: categoryId
+    })
+
+    if (!category) throw new NotFoundException('Такой категории не существует');
+
+    return await this.categoryRepository.remove(category);
   }
 }
