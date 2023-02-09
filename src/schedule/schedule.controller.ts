@@ -2,19 +2,21 @@ import {
   Body,
   Controller,
   Delete,
-  HttpCode,
+  Get,
   Param,
+  Patch,
   Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ScheduleDto } from './dto/schedule.dto';
 import { ScheduleService } from './schedule.service';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../user/enums/userType.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/role.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../user/enums/userType.enum';
+import { UpdateScheduleDto } from './dto/updateSchedule.dto';
+import { CreateScheduleDto } from './dto/createSchedule.dto';
 
 @Controller('schedules')
 export class ScheduleController {
@@ -22,21 +24,37 @@ export class ScheduleController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
+  @Get(':groupId')
+  async index(@Param('groupId') groupId: number) {
+    return this.scheduleService.getScheduleByGroup(groupId);
+  }
+
   @UsePipes(new ValidationPipe())
-  @HttpCode(201)
-  @Put('create/:groupId')
-  async createSchedule(
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Put(':groupId/create')
+  async create(
     @Param('groupId') groupId: number,
-    @Body() dto: ScheduleDto,
+    @Body() body: CreateScheduleDto,
   ) {
-    return this.scheduleService.createSchedule(groupId, dto);
+    return this.scheduleService.createSchedule(groupId, body);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Patch(':groupId/:scheduleId')
+  async update(
+    @Param() params: { groupId: number; scheduleId: number },
+    @Body() body: UpdateScheduleDto,
+  ) {
+    return this.scheduleService.updateSchedule(params, body);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
-  @Delete(':id')
-  async deleteSchedule(@Param('id') id: number) {
-    console.log(id);
-    return this.scheduleService.deleteSchedule(id);
+  @Delete(':groupId/:scheduleId')
+  async destroy(@Param() params: { groupId: number; scheduleId: number }) {
+    return this.scheduleService.destroySchedule(params);
   }
 }

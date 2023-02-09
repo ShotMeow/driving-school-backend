@@ -2,8 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ScheduleEntity } from './entities/schedule.entity';
-import { ScheduleDto } from './dto/schedule.dto';
 import { GroupEntity } from '../group/entities/group.entity';
+import { UpdateScheduleDto } from './dto/updateSchedule.dto';
+import { CreateScheduleDto } from './dto/createSchedule.dto';
 
 @Injectable()
 export class ScheduleService {
@@ -14,29 +15,79 @@ export class ScheduleService {
     private readonly groupRepository: Repository<GroupEntity>,
   ) {}
 
-  async createSchedule(groupId: number, dto: ScheduleDto) {
+  async getScheduleByGroup(groupId: number) {
+    const schedule = await this.scheduleRepository.find({
+      where: {
+        group: {
+          id: groupId,
+        },
+      },
+    });
+
+    if (!schedule) throw new NotFoundException('Расписание не найдено');
+
+    return schedule;
+  }
+
+  async createSchedule(groupId: number, body: CreateScheduleDto) {
     const group = await this.groupRepository.findOneBy({
       id: groupId,
     });
 
-    if (!group) throw new NotFoundException('Группа не найдена.');
+    if (!group) throw new NotFoundException('Такой группы не существует');
 
-    const newSchedule = this.scheduleRepository.create({
-      ...dto,
+    const newSchedule = await this.scheduleRepository.create({
+      type: body.type,
+      startTime: body.startTime,
+      endTime: body.endTime,
+      date: body.date,
+      address: body.address,
       group: group,
     });
 
-    return this.scheduleRepository.save(newSchedule);
+    return await this.scheduleRepository.save(newSchedule);
   }
 
-  async deleteSchedule(id: number) {
-    const schedule = await this.scheduleRepository.findOneBy({
-      id: id,
+  async updateSchedule(
+    params: { groupId: number; scheduleId: number },
+    body: UpdateScheduleDto,
+  ) {
+    const group = await this.groupRepository.findOneBy({
+      id: params.groupId,
     });
 
-    if (!schedule) throw new NotFoundException('Запись не найдена.');
+    if (!group) throw new NotFoundException('Такой группы не существует');
 
-    await this.scheduleRepository.delete(id);
-    return true;
+    const schedule = await this.scheduleRepository.findOneBy({
+      id: params.scheduleId,
+      group: group,
+    });
+
+    if (!schedule) throw new NotFoundException('Расписание не найдено');
+
+    if (body.address) schedule.address = body.address;
+    if (body.date) schedule.date = body.date;
+    if (body.startTime) schedule.startTime = body.startTime;
+    if (body.endTime) schedule.endTime = body.endTime;
+    if (body.type) schedule.type = body.type;
+
+    return await this.scheduleRepository.save(schedule);
+  }
+
+  async destroySchedule(params: { groupId: number; scheduleId: number }) {
+    const group = await this.groupRepository.findOneBy({
+      id: params.groupId,
+    });
+
+    if (!group) throw new NotFoundException('Такой группы не существует');
+
+    const schedule = await this.scheduleRepository.findOneBy({
+      id: params.scheduleId,
+      group: group,
+    });
+
+    if (!schedule) throw new NotFoundException('Расписание не найдено');
+
+    return await this.scheduleRepository.remove(schedule);
   }
 }
