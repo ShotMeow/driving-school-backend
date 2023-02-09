@@ -1,9 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, IsNull, Not, Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { Role } from './enums/userType.enum';
-import { UserDto } from './dto/user.dto';
+import { ChangeRoleDto } from './dto/changeRole.dto';
 
 @Injectable()
 export class UserService {
@@ -12,89 +16,71 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async getAllUsers() {
-    return this.userRepository.find();
-  }
+  async getAllUsers(
+    search: string = '',
+    role: Role,
+    withGroup: 'true' | 'false',
+  ) {
+    let withGroupBool;
 
-  async getUsersByRoleAndSearchTerm(query: UserDto) {
-    if (query.search) {
-      return this.userRepository.find({
-        where: [
-          { role: query.role, name: ILike(`%${query.search}%`) },
-          { role: query.role, surname: ILike(`%${query.search}%`) },
-          { role: query.role, patronymic: ILike(`%${query.search}%`) },
-        ],
-      });
-    } else {
-      return this.userRepository.find({
-        where: {
-          role: query.role,
-        },
-      });
+    if (withGroup === 'true') {
+      withGroupBool = true;
+    } else if (withGroup === 'false') {
+      withGroupBool = false;
     }
-  }
 
-  async getStudentsWithGroup(search: string) {
-    console.log(search);
-    return this.userRepository.find({
-      where: {
-        role: Role.STUDENT,
-        group: Not(IsNull()),
-      },
+    return await this.userRepository.find({
+      where: [
+        {
+          role: role,
+          surname: ILike(`%${search}%`),
+          group: withGroup && (withGroupBool ? Not(IsNull()) : IsNull()),
+        },
+        {
+          role: role,
+          name: ILike(`%${search}%`),
+          group: withGroup && (withGroupBool ? Not(IsNull()) : IsNull()),
+        },
+        {
+          role: role,
+          patronymic: ILike(`%${search}%`),
+          group: withGroup && (withGroupBool ? Not(IsNull()) : IsNull()),
+        },
+        {
+          role: role,
+          phone: ILike(`%${search}%`),
+          group: withGroup && (withGroupBool ? Not(IsNull()) : IsNull()),
+        },
+        {
+          role: role,
+          email: ILike(`%${search}%`),
+          group: withGroup && (withGroupBool ? Not(IsNull()) : IsNull()),
+        },
+      ],
     });
   }
 
-  async getStudentsWithoutGroup() {
-    return this.userRepository.find({
-      where: {
-        role: Role.STUDENT,
-        group: IsNull(),
-      },
+  async changeUserRole(userId: number, body: ChangeRoleDto) {
+    const user = await this.userRepository.findOneBy({
+      id: userId,
     });
+
+    if (!user) throw new NotFoundException('Пользователь не найден');
+    if (body.role === Role.ADMIN)
+      throw new BadRequestException('Недостаточно прав для этого действия');
+
+    user.role = body.role;
+
+    return await this.userRepository.save(user);
   }
 
-  async changeUserRole(userId: number, role: Role) {
+  async getAuthUser(userId: number) {
     const user = await this.userRepository.findOneBy({
       id: userId,
     });
 
     if (!user) throw new NotFoundException('Пользователь не найден');
 
-    user.role = role;
-
-    return this.userRepository.save(user);
-  }
-
-  async getAuthUser(userId: number) {
-    const user = await this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-    });
-
-    if (!user) throw new NotFoundException('Пользователь не найден');
-
     return user;
-  }
-
-  async getGroupByUserId(userId: number) {
-    const user = await this.userRepository.findOne({
-      where: {
-        id: userId,
-        role: Role.STUDENT,
-      },
-      relations: {
-        group: {
-          theoryTeacher: true,
-          practiceTeacher: true,
-          schedules: true,
-          category: true,
-        },
-      },
-    });
-
-    if (!user) throw new NotFoundException('Студент не найден');
-
-    return user.group;
   }
 }
