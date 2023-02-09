@@ -122,6 +122,74 @@ export class GroupService {
     return await this.groupRepository.remove(group);
   }
 
+  async pushStudentToGroup(groupId: number, userId: number) {
+    const group = await this.groupRepository.findOne({
+      where: {
+        id: groupId,
+      },
+      relations: {
+        students: true,
+      },
+    });
+
+    if (!group) throw new NotFoundException('Такой группы не существует');
+
+    const oldStudent = await this.userRepository.findOne({
+      where: {
+        id: userId,
+        role: Role.STUDENT,
+        group: group,
+      },
+    });
+
+    if (oldStudent)
+      throw new NotFoundException('Студент уже числится в этой группе');
+
+    const student = await this.userRepository.findOne({
+      where: {
+        id: userId,
+        role: Role.STUDENT,
+      },
+    });
+
+    if (!student) throw new NotFoundException('Такого студента не существует');
+
+    group.students.push(student);
+
+    return await this.groupRepository.save(group);
+  }
+
+  async destroyStudentFromGroup(groupId: number, userId: number) {
+    const group = await this.groupRepository.findOne({
+      where: {
+        id: groupId,
+      },
+      relations: {
+        students: true,
+      },
+    });
+
+    if (!group) throw new NotFoundException('Такой группы не существует');
+
+    const student = await this.userRepository.findOne({
+      where: {
+        id: userId,
+        role: Role.STUDENT,
+        group: group,
+      },
+      loadRelationIds: true,
+    });
+
+    if (!student)
+      throw new NotFoundException(
+        'Такого студента в данной группе не существует',
+      );
+
+    group.students[group.students.indexOf(student) + 1] = null;
+
+    return await this.groupRepository.save(group);
+  }
+
   async getTheoryTeacher(theoryTeacherId: number) {
     const theoryTeacher = await this.userRepository.findOneBy({
       id: theoryTeacherId,

@@ -62,4 +62,25 @@ export class GroupController {
   async destroy(@Param('groupId') groupId: number) {
     return this.groupService.destroyGroup(groupId);
   }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Patch(':groupId/:userId')
+  async pushStudentToGroup(
+    @Param() params: { groupId: number; userId: number },
+  ) {
+    return this.groupService.pushStudentToGroup(params.groupId, params.userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Delete(':groupId/:userId')
+  async destroyStudentFromGroup(
+    @Param() params: { groupId: number; userId: number },
+  ) {
+    return this.groupService.destroyStudentFromGroup(
+      params.groupId,
+      params.userId,
+    );
+  }
 }
