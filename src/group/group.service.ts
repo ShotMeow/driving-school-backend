@@ -107,7 +107,7 @@ export class GroupService {
     if (body.category_id)
       group.category = await this.getCategory(body.category_id);
 
-    return group;
+    return await this.groupRepository.save(group);
   }
 
   async destroyGroup(groupId: number) {
@@ -119,7 +119,7 @@ export class GroupService {
 
     if (!group) throw new NotFoundException('Такой группы не существует');
 
-    return this.groupRepository.remove(group);
+    return await this.groupRepository.remove(group);
   }
 
   async getTheoryTeacher(theoryTeacherId: number) {
