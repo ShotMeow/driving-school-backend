@@ -15,7 +15,7 @@ import { GroupService } from './group.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../user/enums/userType.enum';
+import { UserRole } from '../user/enums/userType.enum';
 import { CreateGroupDto } from './dto/createGroup.dto';
 import { UpdateGroupDto } from './dto/updateGroup.dto';
 
@@ -24,7 +24,7 @@ export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Get()
   async index(@Query('search') search: string) {
     return this.groupService.getAllGroups(search);
@@ -32,22 +32,22 @@ export class GroupController {
 
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Put('create')
   async create(@Body() body: CreateGroupDto) {
     return this.groupService.createGroup(body);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Get(':groupId')
   async show(@Param('groupId') groupId: number) {
-    return this.groupService.getCurrentGroup(groupId);
+    return this.groupService.getGroupById(groupId);
   }
 
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Patch(':groupId')
   async update(
     @Param('groupId') groupId: number,
@@ -57,14 +57,14 @@ export class GroupController {
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Delete(':groupId')
   async destroy(@Param('groupId') groupId: number) {
     return this.groupService.destroyGroup(groupId);
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Patch(':groupId/:userId')
   async pushStudentToGroup(
     @Param() params: { groupId: number; userId: number },
@@ -73,7 +73,7 @@ export class GroupController {
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Delete(':groupId/:userId')
   async destroyStudentFromGroup(
     @Param() params: { groupId: number; userId: number },

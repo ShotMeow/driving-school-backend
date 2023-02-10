@@ -2,7 +2,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../utils/dto.utils';
 import { GroupEntity } from '../../group/entities/group.entity';
 import { JoinColumn } from 'typeorm';
-import { Role } from '../enums/userType.enum';
+import { UserRole } from '../enums/userType.enum';
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
@@ -24,8 +24,8 @@ export class UserEntity extends BaseEntity {
   @Column({ select: false })
   password: string;
 
-  @Column({ default: 'student', enum: Role })
-  role: Role;
+  @Column({ default: 'student', enum: UserRole })
+  role: UserRole;
 
   @Column({ default: null, name: 'avatar_path' })
   avatarPath?: string;

@@ -6,7 +6,7 @@ import { UserEntity } from '../user/entities/user.entity';
 import { CategoryEntity } from '../category/entities/category.entity';
 import { ScheduleEntity } from '../schedule/entities/schedule.entity';
 import { CreateGroupDto } from './dto/createGroup.dto';
-import { Role } from '../user/enums/userType.enum';
+import { UserRole } from '../user/enums/userType.enum';
 import { UpdateGroupDto } from './dto/updateGroup.dto';
 
 @Injectable()
@@ -61,16 +61,24 @@ export class GroupService {
           },
         },
       ],
-      loadRelationIds: true,
+      relations: {
+        practiceTeacher: true,
+        theoryTeacher: true,
+        category: true,
+      },
     });
   }
 
-  async getCurrentGroup(groupId: number) {
+  async getGroupById(groupId: number) {
     const group = await this.groupRepository.findOne({
       where: {
         id: groupId,
       },
-      loadRelationIds: true,
+      relations: {
+        practiceTeacher: true,
+        theoryTeacher: true,
+        category: true,
+      },
     });
 
     if (!group) throw new NotFoundException('Такой группы не существует');
@@ -80,9 +88,9 @@ export class GroupService {
 
   async createGroup(body: CreateGroupDto) {
     const newGroup = await this.groupRepository.create({
-      theoryTeacher: await this.getTheoryTeacher(body.theory_teacher_id),
-      practiceTeacher: await this.getPracticeTeacher(body.practice_teacher_id),
-      category: await this.getCategory(body.category_id),
+      theoryTeacher: await this.getTheoryTeacher(body.theoryTeacherId),
+      practiceTeacher: await this.getPracticeTeacher(body.practiceTeacherId),
+      category: await this.getCategory(body.categoryId),
     });
 
     return await this.groupRepository.save(newGroup);
@@ -98,14 +106,14 @@ export class GroupService {
 
     if (!group) throw new NotFoundException('Такой группы не существует');
 
-    if (body.theory_teacher_id)
-      group.theoryTeacher = await this.getTheoryTeacher(body.theory_teacher_id);
-    if (body.practice_teacher_id)
+    if (body.theoryTeacherId)
+      group.theoryTeacher = await this.getTheoryTeacher(body.theoryTeacherId);
+    if (body.practiceTeacherId)
       group.practiceTeacher = await this.getPracticeTeacher(
-        body.practice_teacher_id,
+        body.practiceTeacherId,
       );
-    if (body.category_id)
-      group.category = await this.getCategory(body.category_id);
+    if (body.categoryId)
+      group.category = await this.getCategory(body.categoryId);
 
     return await this.groupRepository.save(group);
   }
@@ -115,9 +123,21 @@ export class GroupService {
       where: {
         id: groupId,
       },
+      loadRelationIds: true,
     });
 
     if (!group) throw new NotFoundException('Такой группы не существует');
+
+    group.theoryTeacher = null;
+    group.practiceTeacher = null;
+    group.category = null;
+    group.students = null;
+
+    for (const schedule of group.schedules) {
+      await this.scheduleRepository.delete(schedule);
+    }
+
+    await this.groupRepository.save(group);
 
     return await this.groupRepository.remove(group);
   }
@@ -137,7 +157,7 @@ export class GroupService {
     const oldStudent = await this.userRepository.findOne({
       where: {
         id: userId,
-        role: Role.STUDENT,
+        role: UserRole.STUDENT,
         group: group,
       },
     });
@@ -148,7 +168,7 @@ export class GroupService {
     const student = await this.userRepository.findOne({
       where: {
         id: userId,
-        role: Role.STUDENT,
+        role: UserRole.STUDENT,
       },
     });
 
@@ -174,7 +194,7 @@ export class GroupService {
     const student = await this.userRepository.findOne({
       where: {
         id: userId,
-        role: Role.STUDENT,
+        role: UserRole.STUDENT,
         group: group,
       },
       loadRelationIds: true,
@@ -193,7 +213,7 @@ export class GroupService {
   async getTheoryTeacher(theoryTeacherId: number) {
     const theoryTeacher = await this.userRepository.findOneBy({
       id: theoryTeacherId,
-      role: Role.THEORY_TEACHER,
+      role: UserRole.THEORY_TEACHER,
     });
 
     if (!theoryTeacher)
@@ -205,7 +225,7 @@ export class GroupService {
   async getPracticeTeacher(practiceTeacherId: number) {
     const practiceTeacher = await this.userRepository.findOneBy({
       id: practiceTeacherId,
-      role: Role.PRACTICE_TEACHER,
+      role: UserRole.PRACTICE_TEACHER,
     });
 
     if (!practiceTeacherId)

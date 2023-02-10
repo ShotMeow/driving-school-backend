@@ -14,7 +14,7 @@ import { ScheduleService } from './schedule.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../user/enums/userType.enum';
+import { UserRole } from '../user/enums/userType.enum';
 import { UpdateScheduleDto } from './dto/updateSchedule.dto';
 import { CreateScheduleDto } from './dto/createSchedule.dto';
 
@@ -23,7 +23,7 @@ export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Get(':groupId')
   async index(@Param('groupId') groupId: number) {
     return this.scheduleService.getScheduleByGroup(groupId);
@@ -31,7 +31,7 @@ export class ScheduleController {
 
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Put(':groupId/create')
   async create(
     @Param('groupId') groupId: number,
@@ -42,7 +42,7 @@ export class ScheduleController {
 
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Patch(':groupId/:scheduleId')
   async update(
     @Param() params: { groupId: number; scheduleId: number },
@@ -52,7 +52,7 @@ export class ScheduleController {
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(UserRole.ADMIN)
   @Delete(':groupId/:scheduleId')
   async destroy(@Param() params: { groupId: number; scheduleId: number }) {
     return this.scheduleService.destroySchedule(params);

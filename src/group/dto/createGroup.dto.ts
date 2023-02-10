@@ -2,11 +2,11 @@ import { IsNumber } from 'class-validator';
 
 export class CreateGroupDto {
   @IsNumber()
-  practice_teacher_id: number;
+  practiceTeacherId: number;
 
   @IsNumber()
-  theory_teacher_id: number;
+  theoryTeacherId: number;
 
   @IsNumber()
-  category_id: number;
+  categoryId: number;
 }

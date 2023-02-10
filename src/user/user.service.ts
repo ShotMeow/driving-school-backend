@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, IsNull, Not, Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
-import { Role } from './enums/userType.enum';
+import { UserRole } from './enums/userType.enum';
 import { ChangeRoleDto } from './dto/changeRole.dto';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class UserService {
 
   async getAllUsers(
     search: string = '',
-    role: Role,
+    role: UserRole,
     withGroup: 'true' | 'false',
   ) {
     let withGroupBool;
@@ -57,7 +57,27 @@ export class UserService {
           group: withGroup && (withGroupBool ? Not(IsNull()) : IsNull()),
         },
       ],
+      relations: {
+        group: {
+          practiceTeacher: true,
+          theoryTeacher: true,
+          category: true,
+        },
+      },
     });
+  }
+
+  async getUserById(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+      loadRelationIds: true,
+    });
+
+    if (!user) throw new NotFoundException('Пользователь не найден');
+
+    return user;
   }
 
   async changeUserRole(userId: number, body: ChangeRoleDto) {
@@ -66,7 +86,7 @@ export class UserService {
     });
 
     if (!user) throw new NotFoundException('Пользователь не найден');
-    if (body.role === Role.ADMIN)
+    if (body.role === UserRole.ADMIN)
       throw new BadRequestException('Недостаточно прав для этого действия');
 
     user.role = body.role;
@@ -75,8 +95,9 @@ export class UserService {
   }
 
   async getAuthUser(userId: number) {
-    const user = await this.userRepository.findOneBy({
-      id: userId,
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      loadRelationIds: true,
     });
 
     if (!user) throw new NotFoundException('Пользователь не найден');
