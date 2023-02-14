@@ -22,7 +22,7 @@ export class GroupService {
     private readonly scheduleRepository: Repository<ScheduleEntity>,
   ) {}
 
-  async getAllGroups(search: string = '') {
+  async getAllGroups(search = '') {
     return await this.groupRepository.find({
       where: [
         {
@@ -65,6 +65,7 @@ export class GroupService {
         practiceTeacher: true,
         theoryTeacher: true,
         category: true,
+        students: true,
       },
     });
   }
@@ -101,7 +102,12 @@ export class GroupService {
       where: {
         id: groupId,
       },
-      loadRelationIds: true,
+      relations: {
+        theoryTeacher: true,
+        practiceTeacher: true,
+        category: true,
+        students: true,
+      }
     });
 
     if (!group) throw new NotFoundException('Такой группы не существует');

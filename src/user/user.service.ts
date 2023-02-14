@@ -72,7 +72,6 @@ export class UserService {
       where: {
         id: userId,
       },
-      loadRelationIds: true,
     });
 
     if (!user) throw new NotFoundException('Пользователь не найден');
