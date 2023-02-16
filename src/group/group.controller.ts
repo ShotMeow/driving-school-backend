@@ -24,7 +24,6 @@ export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.ADMIN)
   @Get()
   async index(@Query('search') search: string) {
     return this.groupService.getAllGroups(search);

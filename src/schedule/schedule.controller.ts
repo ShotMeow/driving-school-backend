@@ -5,7 +5,7 @@ import {
   Get,
   Param,
   Patch,
-  Put,
+  Put, Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -23,15 +23,22 @@ export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Get()
+  async index(@Query('teacherId') teacherId: number) {
+    console.log(teacherId);
+    return this.scheduleService.getSchedules(teacherId);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRole.ADMIN)
   @Get(':groupId')
-  async index(@Param('groupId') groupId: number) {
+  async show(@Param('groupId') groupId: number) {
     return this.scheduleService.getScheduleByGroup(groupId);
   }
 
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.THEORY_TEACHER || UserRole.PRACTICE_TEACHER)
   @Put(':groupId/create')
   async create(
     @Param('groupId') groupId: number,
@@ -52,7 +59,7 @@ export class ScheduleController {
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.THEORY_TEACHER || UserRole.PRACTICE_TEACHER)
   @Delete(':groupId/:scheduleId')
   async destroy(@Param() params: { groupId: number; scheduleId: number }) {
     return this.scheduleService.destroySchedule(params);

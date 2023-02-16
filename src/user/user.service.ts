@@ -96,7 +96,13 @@ export class UserService {
   async getAuthUser(userId: number) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      loadRelationIds: true,
+      relations: {
+        group: {
+          theoryTeacher: true,
+          practiceTeacher: true,
+          category: true,
+        }
+      }
     });
 
     if (!user) throw new NotFoundException('Пользователь не найден');

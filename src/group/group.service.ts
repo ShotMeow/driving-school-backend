@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GroupEntity } from './entities/group.entity';
-import { ILike, Repository } from 'typeorm';
+import {Any, ILike, Not, Repository} from 'typeorm';
 import { UserEntity } from '../user/entities/user.entity';
 import { CategoryEntity } from '../category/entities/category.entity';
 import { ScheduleEntity } from '../schedule/entities/schedule.entity';
@@ -41,6 +41,16 @@ export class GroupService {
           },
         },
         {
+          theoryTeacher: {
+            email: ILike(`%${search}%`),
+          },
+        },
+        {
+          theoryTeacher: {
+            phone: ILike(`%${search}%`),
+          },
+        },
+        {
           practiceTeacher: {
             surname: ILike(`%${search}%`),
           },
@@ -56,9 +66,22 @@ export class GroupService {
           },
         },
         {
+          practiceTeacher: {
+            email: ILike(`%${search}%`),
+          },
+        },
+        {
+          practiceTeacher: {
+            phone: ILike(`%${search}%`),
+          },
+        },
+        {
           category: {
             value: ILike(`%${search}%`),
           },
+        },
+        {
+          id: !isNaN(+search) ? +search : undefined,
         },
       ],
       relations: {

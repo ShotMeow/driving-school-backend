@@ -15,6 +15,30 @@ export class ScheduleService {
     private readonly groupRepository: Repository<GroupEntity>,
   ) {}
 
+  async getSchedules(teacherId) {
+    return await this.scheduleRepository.find({
+      where: [
+        {
+          group: {
+            theoryTeacher: {
+              id: teacherId,
+            },
+          },
+        },
+        {
+          group: {
+            practiceTeacher: {
+              id: teacherId,
+            },
+          },
+        },
+      ],
+      relations: {
+        group: true,
+      },
+    });
+  }
+
   async getScheduleByGroup(groupId: number) {
     const schedule = await this.scheduleRepository.find({
       where: {
