@@ -41,7 +41,6 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   async getAuthUser(@User() user) {
-    console.log(user);
     return this.userService.getAuthUser(user.id);
   }
 

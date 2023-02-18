@@ -38,7 +38,7 @@ export class ScheduleController {
 
   @UsePipes(new ValidationPipe())
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.THEORY_TEACHER || UserRole.PRACTICE_TEACHER)
+  @Roles(UserRole.THEORY_TEACHER && UserRole.PRACTICE_TEACHER)
   @Put(':groupId/create')
   async create(
     @Param('groupId') groupId: number,
@@ -59,7 +59,7 @@ export class ScheduleController {
   }
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRole.THEORY_TEACHER || UserRole.PRACTICE_TEACHER)
+  @Roles(UserRole.THEORY_TEACHER && UserRole.PRACTICE_TEACHER)
   @Delete(':groupId/:scheduleId')
   async destroy(@Param() params: { groupId: number; scheduleId: number }) {
     return this.scheduleService.destroySchedule(params);
