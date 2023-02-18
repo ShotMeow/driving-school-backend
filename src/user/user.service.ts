@@ -101,6 +101,15 @@ export class UserService {
           theoryTeacher: true,
           practiceTeacher: true,
           category: true,
+          schedules: true
+        }
+      },
+      order: {
+        group: {
+          schedules: {
+            date: "ASC",
+            startTime: "ASC"
+          }
         }
       }
     });

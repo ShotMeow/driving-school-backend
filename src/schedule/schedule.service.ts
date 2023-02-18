@@ -36,6 +36,10 @@ export class ScheduleService {
       relations: {
         group: true,
       },
+      order: {
+        date: "ASC",
+        startTime: "ASC"
+      }
     });
   }
 
